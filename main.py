@@ -50,7 +50,6 @@ def remove_coin(update, context):
 def fetch_price(update, context):
     print(coinlist)
     a = "%2C".join(coinlist)
-    # a = coinlist[0]
     print(a)
     pricelist = []
 
@@ -58,9 +57,10 @@ def fetch_price(update, context):
     price_data = list(fetch.items())
     for coin, price in price_data:
         # pricelist.append(str(coin) + ": ₹" + str(fetch[coin]['inr'] * 1.115))
-        pricelist.append(str(coin) + ":" + str(fetch[coin]['inr'] * 1.115) + "\n")
-    update.message.reply_text(pricelist)
-    print(pricelist)
+        pricelist.append(str(coin) + " : ₹" + str(fetch[coin]['inr'] * 1.115) + "\n")
+    a = "".join(pricelist)
+    update.message.reply_text(a)
+    print(a)
 
 
 
