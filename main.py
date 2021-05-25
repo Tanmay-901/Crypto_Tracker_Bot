@@ -25,7 +25,7 @@ def add_coin(update, context):
     c = str(update.effective_message.text)[5:]
     if c in main_list and c not in coinlist:
         coinlist.append(c)
-        update.message.reply_text("".join(coinlist))
+        update.message.reply_text(" ".join(coinlist))
         print("added: ", c)
         c = ""
     elif c not in main_list:
@@ -45,7 +45,8 @@ def remove_coin(update, context):
         coinlist.remove(c)
         update.message.reply_text(coinlist)
     else:
-        update.message.reply_text("\nCoin is not being tracked already ")
+        update.message.reply_text("\nCoin is already not being tracked anyway!! ")
+        update.message.reply_text("😏")
 
 
 def fetch_price(update, context):
@@ -74,7 +75,7 @@ def help_command(update, context):
 
 
 def show_coins(update, context):
-    update.message.reply_text(update.message.reply_text("".join(coinlist)))
+    update.message.reply_text(update.message.reply_text(" ".join(coinlist)))
 
 
 def take_input(update, context):
@@ -82,8 +83,8 @@ def take_input(update, context):
     print(text)
 
 
-# def error_handling(update, context):
-#     print(f"Update {update} caused error: {context.error}")
+def error_handling(update, context):
+    print(f"Update {update} caused error: {context.error}")
 
 
 def main():
@@ -99,9 +100,10 @@ def main():
     dp.add_handler(CommandHandler("fetch", fetch_price))
     dp.add_handler(MessageHandler(Filters.text, take_input))
 
-    # dp.add_error_handler(error_handling)
+    dp.add_error_handler(error_handling)
     updater.start_polling()
     updater.idle()
+
 
 if __name__ == '__main__':
     Telegram_API_KEY = environ['Telegram_API_KEY']
