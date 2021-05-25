@@ -62,7 +62,6 @@ def fetch_price(update, context):
     print(pricelist)
 
 
-
 def start_command(update, context):
     name = update.message.from_user.first_name
     reply = "Hi!! {} Please add coins to track:".format(name)
