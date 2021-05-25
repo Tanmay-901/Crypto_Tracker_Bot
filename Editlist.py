@@ -16,6 +16,19 @@ class Editlist:
                           'Republic Protocol', 'Maker', 'QuarkChain', 'Swipe', 'Synthetix Network Token', 'Stellar',
                           'DFI.money', 'Ripio Credit Network', 'Status', 'Storj', 'aelf', 'district0x']
 
+    def edit_list(self):
+        print("\nCOIN LIST =>", *self.coinlist)
+        while 1:
+            self.coinlist_action = input("\nEnter 1 to add coin || 2 to remove coin || 3 to proceed: ")
+            if self.coinlist_action == "1":
+                self.add_coin()
+            elif self.coinlist_action == "2":
+                self.remove_coin()
+            elif self.coinlist_action == "3":
+                self.coinlist_action = ""
+                break
+        return self.coinlist
+
     def take_input(self):
         while 1:
             c = input("\nEnter New Coin or 'N' to Proceed: ")
@@ -52,19 +65,6 @@ class Editlist:
             else:
                 continue
         self.send_price_to_file()
-
-    def edit_list(self):
-        print("\nCOIN LIST =>", *self.coinlist)
-        while 1:
-            self.coinlist_action = input("\nEnter 1 to add coin || 2 to remove coin || 3 to proceed: ")
-            if self.coinlist_action == "1":
-                self.add_coin()
-            elif self.coinlist_action == "2":
-                self.remove_coin()
-            elif self.coinlist_action == "3":
-                self.coinlist_action = ""
-                break
-        return self.coinlist
 
     def get_price_from_file(self):
         self.coin_record = open("coins.txt", "r")
