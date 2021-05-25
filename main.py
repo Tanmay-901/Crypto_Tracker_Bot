@@ -25,6 +25,7 @@ def add_coin(update, context):
     c = str(update.effective_message.text)[5:]
     if c in main_list and c not in coinlist:
         coinlist.append(c)
+        update.message.reply_text("".join(coinlist))
         print("added: ", c)
         c = ""
     elif c not in main_list:
@@ -60,8 +61,6 @@ def fetch_price(update, context):
         pricelist.append(str(coin) + " : ₹" + str(fetch[coin]['inr'] * 1.115) + "\n")
     a = "".join(pricelist)
     update.message.reply_text(a)
-    print(a)
-
 
 
 def start_command(update, context):
@@ -75,7 +74,7 @@ def help_command(update, context):
 
 
 def show_coins(update, context):
-    update.message.reply_text(coinlist)
+    update.message.reply_text(update.message.reply_text("".join(coinlist)))
 
 
 def take_input(update, context):
