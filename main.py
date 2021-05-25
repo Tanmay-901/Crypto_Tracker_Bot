@@ -1,7 +1,8 @@
 import logging
 import requests
-import constraints as co
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import os
+from os import environ
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',     #take time,level,name
                     level=logging.INFO)
@@ -88,7 +89,7 @@ def take_input(update, context):
 
 def main():
     """Start the bot."""
-    updater = Updater(token=co.Telegram_API_KEY, use_context=True)
+    updater = Updater(token=Telegram_API_KEY, use_context=True)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start_command))
@@ -104,5 +105,6 @@ def main():
     updater.idle()
 
 if __name__ == '__main__':
+    Telegram_API_KEY = environ['Telegram_API_KEY']
     coinlist = []
     main()
