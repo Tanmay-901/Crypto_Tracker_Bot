@@ -105,7 +105,7 @@ def take_input(update, context):
     elif "Love" in text or "love" in text:
         update.message.reply_text("🙈")
     elif "Hi" in text or "hi" in text or "hello" in text or "Hello" in text:
-        pass
+        update.message.reply_text("Hello!!! 😃")
     else:
         print(text)
 
