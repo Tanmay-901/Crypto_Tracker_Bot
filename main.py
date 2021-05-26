@@ -3,11 +3,11 @@ import requests
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import os
 from os import environ
+import time
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',     #take time,level,name
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
-print("Bot started...")
 
 main_list = ['Zilliqa', 'Band Protocol', 'Algorand', 'Theta Network', 'iExec RLC', 'Cosmos',
                   'DigiByte', 'Chiliz', 'Terra', 'Theta Fuel', 'Waves', 'Nano', 'IOST', 'Tezos',
@@ -21,12 +21,37 @@ main_list = ['Zilliqa', 'Band Protocol', 'Algorand', 'Theta Network', 'iExec RLC
                   'DFI.money', 'Ripio Credit Network', 'Status', 'Storj', 'aelf', 'district0x']
 
 
+def start_command(update, context):
+    name = update.message.from_user.first_name
+    reply = "Hi!! {} Please add coins to track:".format(name)
+    update.message.reply_text(reply)
+
+
+def help_command(update, context):
+    update.message.reply_text("Go and ask google for help! 😏")
+    time.sleep(2)
+    update.message.reply_text('''
+Just kidding!!\nHere are some commands you can use in this bot\n
+/start : start the bot\n
+/help : see commands\n
+/add <coin> : add coin to tracker\n
+/remove <coin> : remove coin from tracker\n
+/show : show current coinlist\n
+/fetch : fetch prices\n
+''')
+
+
 def add_coin(update, context):
     c = str(update.effective_message.text)[5:]
+    if len(c) <= 2:
+        update.message.reply_text("Abe Coin name to daal 🤨")
+        bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.TYPING)
+        time.sleep(2)
+        update.message.reply_text("for example:\n/add Bitcoin")
+        return
     if c in main_list and c not in coinlist:
         coinlist.append(c)
-        update.message.reply_text(" ".join(coinlist))
-        print("added: ", c)
+        update.message.reply_text(c + " added ✍🏼")
         c = ""
     elif c not in main_list:
         update.message.reply_text("\nInvalid Input!!!\nUnsupported Coin-name ")
@@ -35,52 +60,60 @@ def add_coin(update, context):
     elif c in coinlist:
         update.message.reply_text("\nCoin Already being tracked ")
         update.message.reply_text("😎")
-        print(c, "already present")
 
 
 def remove_coin(update, context):
     c = str(update.effective_message.text)[8:]
-    print("remove request:", c)
+    if len(c) <= 2:
+        update.message.reply_text("Abe Coin name to daal 🤨")
+        time.sleep(2)
+        update.message.reply_text("for example:\n/remove Bitcoin")
+        return
     if c in coinlist:
         coinlist.remove(c)
-        update.message.reply_text(coinlist)
+        update.message.reply_text(c + " removed 🤝🏼\nNow tracking: " + " ".join(coinlist))
     else:
         update.message.reply_text("\nCoin is already not being tracked anyway!! ")
         update.message.reply_text("😏")
 
 
-def fetch_price(update, context):
-    print(coinlist)
-    a = "%2C".join(coinlist)
-    print(a)
-    pricelist = []
+def show_coins(update, context):
+    update.message.reply_text(" ".join(coinlist))
 
+
+def fetch_price(update, context):
+    a = "%2C".join(coinlist)
+    pricelist = []
     fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={a}&vs_currencies=inr").json()
     price_data = list(fetch.items())
     for coin, price in price_data:
-        # pricelist.append(str(coin) + ": ₹" + str(fetch[coin]['inr'] * 1.115))
-        pricelist.append(str(coin) + " : ₹" + str(fetch[coin]['inr'] * 1.115) + "\n")
+        # print("%.2f" % (fetch[coin]['inr'] * 1.115))
+        pricelist.append(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.112)) + "\n")
     a = "".join(pricelist)
     update.message.reply_text(a)
 
 
-def start_command(update, context):
-    name = update.message.from_user.first_name
-    reply = "Hi!! {} Please add coins to track:".format(name)
-    update.message.reply_text(reply)
-
-
-def help_command(update, context):
-    update.message.reply_text("Go and ask google for help!")
-
-
-def show_coins(update, context):
-    update.message.reply_text(update.message.reply_text(" ".join(coinlist)))
-
-
 def take_input(update, context):
     text = str(update.message.text)
-    print(text)
+    if text in main_list:
+        fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={text}&vs_currencies=inr").json()
+        price_data = list(fetch.items())
+        for coin, price in price_data:
+            update.message.reply_text(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.112)) + "\n")
+    elif "bhag" in text or "Bhag" in text or "bhaag" in text or "Bhaag" in text:
+        update.message.reply_text("Bhagau kya abhi 😒")
+    elif "Love" in text or "love" in text:
+        update.message.reply_text("🙈")
+    elif "Hi" in text or "hi" in text or "hello" in text or "Hello" in text:
+        pass
+    else:
+        print(text)
+
+
+def unknown_commands(update, context):
+    text = str(update.message.text)
+    update.message.reply_text("Jaa re")
+    update.message.reply_text("Command not found")
 
 
 def error_handling(update, context):
