@@ -41,6 +41,15 @@ Just kidding!!\nHere are some commands you can use in this bot\n
 ''')
 
 
+def look_for(c):
+    if c in main_list:
+        return True
+    for x in main_list:
+        if x.lower() == c or x.upper() == c:
+            return True
+    return False
+
+
 def add_coin(update, context):
     c = str(update.effective_message.text)[5:]
     if len(c) <= 2:
@@ -49,22 +58,22 @@ def add_coin(update, context):
         time.sleep(2)
         update.message.reply_text("for example:\n/add Bitcoin")
         return
-    if c in main_list and c not in coinlist:
-        coinlist.append(c)
-        update.message.reply_text(c + " added ✍🏼")
-        c = ""
-    elif c not in main_list:
-        update.message.reply_text("\nInvalid Input!!!\nUnsupported Coin-name ")
-        update.message.reply_text("😒")
-        print(c, "not in list")
     elif c in coinlist:
         update.message.reply_text("\nCoin Already being tracked ")
         update.message.reply_text("😎")
+    if look_for(c) and c not in coinlist:
+        coinlist.append(c)
+        update.message.reply_text(c + " added ✍🏼")
+        c = ""
+    else:
+        update.message.reply_text("\nInvalid Input!!!\nUnsupported Coin-name ")
+        update.message.reply_text("😒")
+        print(c, "not in list")
 
 
 def remove_coin(update, context):
     c = str(update.effective_message.text)[8:]
-    if len(c) <= 2:
+    if len(c) < 2:
         update.message.reply_text("Abe Coin name to daal 🤨")
         time.sleep(2)
         update.message.reply_text("for example:\n/remove Bitcoin")
@@ -94,26 +103,35 @@ def fetch_price(update, context):
 
 
 def take_input(update, context):
-    text = str(update.message.text)
-    if text in main_list:
-        fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={text}&vs_currencies=inr").json()
-        price_data = list(fetch.items())
-        for coin, price in price_data:
-            update.message.reply_text(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.112)) + "\n")
-    elif "bhag" in text or "Bhag" in text or "bhaag" in text or "Bhaag" in text:
+    text = list(str(update.message.text).strip().split())
+    # if " " in text:
+    #     text = text.split()
+    hi = ["Hi", "hi", "Hii", "hii", "hello", "Hello"]
+    bhag = ["bhag", "Bhag", "bhaag", "Bhaag", "Bhag ja", " bhag ja"]
+    love = ["Love", "love"]
+    print(text)
+    if text[0][0] == "/":
+        update.message.reply_text("Jaa re")
+        time.sleep(2)
+        update.message.reply_text("Command not found")
+        return
+    for i in text:
+        if look_for(i):
+            fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={i}&vs_currencies=inr").json()
+            price_data = list(fetch.items())
+            for coin, price in price_data:
+                update.message.reply_text(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.112)) + "\n")
+                continue
+    if any(x in text for x in bhag):
         update.message.reply_text("Bhagau kya abhi 😒")
-    elif "Love" in text or "love" in text:
+        return
+    elif any(x in text for x in love):
         update.message.reply_text("🙈")
-    elif "Hi" in text or "hi" in text or "hello" in text or "Hello" in text:
-        update.message.reply_text("Hello!!! 😃")
-    else:
-        print(text)
+        return
+    elif any(x in text for x in hi):
+        context.bot.send_message(update.effective_chat.id, "hello!!! 😋")
+        return
 
-
-def unknown_commands(update, context):
-    text = str(update.message.text)
-    update.message.reply_text("Jaa re")
-    update.message.reply_text("Command not found")
 
 
 def error_handling(update, context):
