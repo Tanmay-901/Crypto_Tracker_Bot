@@ -97,7 +97,7 @@ def fetch_price(update, context):
     price_data = list(fetch.items())
     for coin, price in price_data:
         # print("%.2f" % (fetch[coin]['inr'] * 1.115))
-        pricelist.append(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.112)) + "\n")
+        pricelist.append(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.11)) + "\n")
     a = "".join(pricelist)
     update.message.reply_text(a)
 
@@ -120,7 +120,7 @@ def take_input(update, context):
             fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={i}&vs_currencies=inr").json()
             price_data = list(fetch.items())
             for coin, price in price_data:
-                update.message.reply_text(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.112)) + "\n")
+                update.message.reply_text(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.11)) + "\n")
                 continue
     if any(x in text for x in bhag):
         update.message.reply_text("Bhagau kya abhi 😒")
@@ -128,7 +128,7 @@ def take_input(update, context):
     elif any(x in text for x in love):
         update.message.reply_text("🙈")
         return
-    elif any(x in text for x in hi):
+    elif text[0] in hi:
         context.bot.send_message(update.effective_chat.id, "hello!!! 😋")
         return
 
