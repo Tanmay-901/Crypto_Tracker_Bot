@@ -104,15 +104,7 @@ def fetch_price(update, context):
 
 def take_input(update, context):
     text = list(str(update.message.text).strip().split())
-    # if " " in text:
-    #     text = text.split()
-    hi = ["Hi", "hi", "Hii", "hii", "hello", "Hello"]
-    bhag = ["bhag", "Bhag", "bhaag", "Bhaag", "Bhag ja", " bhag ja"]
-    love = ["Love", "love"]
-    print(text)
     if text[0][0] == "/":
-        update.message.reply_text("Jaa re")
-        time.sleep(2)
         update.message.reply_text("Command not found")
         return
     for i in text:
@@ -122,15 +114,6 @@ def take_input(update, context):
             for coin, price in price_data:
                 update.message.reply_text(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.11)) + "\n")
                 continue
-    if any(x in text for x in bhag):
-        update.message.reply_text("Bhagau kya abhi 😒")
-        return
-    elif any(x in text for x in love):
-        update.message.reply_text("🙈")
-        return
-    elif text[0] in hi:
-        context.bot.send_message(update.effective_chat.id, "hello!!! 😋")
-        return
 
 
 
