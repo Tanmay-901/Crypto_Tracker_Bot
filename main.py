@@ -10,19 +10,34 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-main_list = ['Zilliqa', 'Band Protocol', 'Algorand', 'Theta Network', 'iExec RLC', 'Cosmos',
-                  'DigiByte', 'Chiliz', 'Terra', 'Theta Fuel', 'Waves', 'Nano', 'IOST', 'Tezos',
-                  'VeChain', 'DOT', 'Elrond', 'NEM', 'Filecoin', 'Bitcoin', 'Ethereum', 'Dogecoin',
-                  'Ripple', 'Tron', 'Binance Coin', 'Cardano', 'Bitcoin Cash', 'EOS', 'GAS', 'NEO',
-                  'Litecoin', 'Chainlink', 'Tether', 'Dash', 'Aave', 'Uniswap', 'True USD', 'USD Coin',
-                  'Compound', '0x', 'AdEx', 'Augur', 'Bancor', 'Basic Attention Token', 'Civic', 'Enjin Coin',
-                  'Fetch.ai', 'Golem', 'Kyber Network', 'Metal', 'OmiseGO', 'Paxos Standard Token', 'Power Ledger',
-                  'DIA', 'Sushi', 'Quantstamp', 'Numeraire', 'yearn.finance', 'Dai', 'Loopring', 'AirSwap',
-                  'Republic Protocol', 'Maker', 'QuarkChain', 'Swipe', 'Synthetix Network Token', 'Stellar',
-                  'DFI.money', 'Ripio Credit Network', 'Status', 'Storj', 'aelf', 'district0x']
+main_list = ['usdt', 'btc', 'bchold', 'ltc', 'xrp', 'dash', 'eth', 'trx', 'eos', 'zil', 'ncash', 'bat', 'gnt',
+     'storm', 'req', 'sub', 'nuls', 'icx', 'omg', 'poly', 'iost', 'snt', 'npxs', 'cs', 'fun', 'poe', 'theta',
+     'dent', 'qkc', 'stq', 'zco', 'hot', 'ocn', 'noah', 'banca', 'wrx', 'matic', 'bch', 'bnb', 'btt', 'yfi',
+     'uni', 'link', 'sxp', 'ada', 'atom', 'xlm', 'xem', 'zec', 'busd', 'yfii', 'doge', 'dot', 'vet', 'easy',
+     'crv', 'ren', 'enj', 'mana', 'hbar', 'uma', 'chr', 'paxg', '1inch', 'etc', 'uft', 'dock', 'fil', 'win',
+     'tko', 'push', 'avax', 'luna', 'xvg', 'sc', 'ftt', 'dgb', 'cvc', 'cake', 'ez', 'bzrx', 'ftm', 'hnt', 'ark',
+     'ctsi', 'kmd', 'coti', 'iotx', 'shib', 'rlc', 'trb', 'reef', 'icp', 'ont', 'xvs', 'zrx']
+
+
+def get_price_from_file():
+    coinlist = []
+    coin_record = open("coins.txt", "r")
+    ls = coin_record.readlines()
+    for item in ls:
+        coinlist.append(item.strip())
+    coin_record.close()
+    # print("\nCOIN LIST =>", *self.coinlist)
+
+
+def send_price_to_file():
+    coin_record = open("coins.txt", "w+")
+    for item in coinlist:
+        coin_record.write(item + '\n')
+    coin_record.close()
 
 
 def start_command(update, context):
+    send_price_to_file()
     name = update.message.from_user.first_name
     reply = "Hi!! {} Please add coins to track:".format(name)
     update.message.reply_text(reply)
@@ -43,6 +58,7 @@ Just kidding!!\nHere are some commands you can use in this bot\n
 
 
 def look_for(c):
+    get_price_from_file()
     if c in main_list:
         return True
     for x in main_list:
@@ -53,7 +69,8 @@ def look_for(c):
 
 def add_coin(update, context):
     c = str(update.effective_message.text)[5:]
-    if len(c) <= 2:
+    get_price_from_file()
+    if len(c) < 2:
         update.message.reply_text("please send coin name with the command")
         time.sleep(2)
         update.message.reply_text("for example:\n/add Bitcoin")
@@ -61,8 +78,9 @@ def add_coin(update, context):
     elif c in coinlist:
         update.message.reply_text("\nCoin Already being tracked ")
         update.message.reply_text("😎")
-    if look_for(c) and c not in coinlist:
+    elif look_for(c):
         coinlist.append(c)
+        send_price_to_file()
         update.message.reply_text(c + " added ✍🏼")
         c = ""
     else:
@@ -81,12 +99,14 @@ def remove_coin(update, context):
     if c in coinlist:
         coinlist.remove(c)
         update.message.reply_text(c + " removed 🤝🏼\nNow tracking: " + " ".join(coinlist))
+        send_price_to_file()
     else:
         update.message.reply_text("\nCoin is already not being tracked anyway!! ")
         update.message.reply_text("😏")
 
 
 def show_coins(update, context):
+    get_price_from_file()
     if len(coinlist) == 0:
         update.message.reply_text("No Coin in tracking list!! ")
     else:
@@ -94,36 +114,39 @@ def show_coins(update, context):
 
 
 def fetch_price(update, context):
-    a = "%2C".join(coinlist)
+    get_price_from_file()
+    a = coinlist
     pricelist = []
-    fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={a}&vs_currencies=inr").json()
-    price_data = list(fetch.items())
-    for coin, price in price_data:
-        # print("%.2f" % (fetch[coin]['inr'] * 1.115))
-        pricelist.append(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.11)) + "\n")
+    fetch = requests.get(f'https://api.wazirx.com/api/v2/market-status').json()
+    for i in fetch['markets']:
+        if i['quoteMarket'] == 'inr' and i['baseMarket'] in a:
+            pricelist.append(str(i['baseMarket'] + " : " + i['buy'] + '\n'))
     a = "".join(pricelist)
     update.message.reply_text(a)
 
 
 def repeat_fetch(context: telegram.ext.CallbackContext):
-    a = "%2C".join(coinlist)
+    get_price_from_file()
+    a = coinlist
     pricelist = []
-    fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={a}&vs_currencies=inr").json()
-    price_data = list(fetch.items())
-    for coin, price in price_data:
-        pricelist.append(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'])) + "\n")
+    fetch = requests.get(f'https://api.wazirx.com/api/v2/market-status').json()
+    for i in fetch['markets']:
+        if i['quoteMarket'] == 'inr' and i['baseMarket'] in a:
+            pricelist.append(str(i['baseMarket'] + " : " + i['buy'] + '\n'))
     a = "".join(pricelist)
     context.bot.send_message(chat_id=context.job.context, text=a)
 
+
 def take_input(update, context):
     text = list(str(update.message.text).strip().split())
-    for i in text:
-        if look_for(i):
-            fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={i}&vs_currencies=inr").json()
-            price_data = list(fetch.items())
-            for coin, price in price_data:
-                update.message.reply_text(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.11)) + "\n")
-                continue
+    for x in text:
+        if look_for(x):
+            fetch = requests.get(f'https://api.wazirx.com/api/v2/market-status').json()
+            for i in fetch['markets']:
+                if i['quoteMarket'] == 'inr' and i['baseMarket'] in x:
+                    a = str(i['baseMarket'] + " : " + i['buy'])
+                    update.message.reply_text(a)
+            continue
 
 
 def command_handler(update, context):
@@ -162,6 +185,6 @@ def main():
 
 if __name__ == '__main__':
     Telegram_API_KEY = environ['Telegram_API_KEY']
-    coinlist = ['bitcoin', 'dogecoin', 'Cardano', 'DigiByte', 'Zilliqa', 'Swipe', 'Ethereum',
-                'VeChain', 'NEM']
+    coinlist = ['btc', 'doge', 'ada', 'dgb', 'zil', 'sxp', 'eth',
+                'vet', 'xem', 'iost']
     main()
