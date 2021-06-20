@@ -111,7 +111,7 @@ def repeat_fetch(context: telegram.ext.CallbackContext):
     fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={a}&vs_currencies=inr").json()
     price_data = list(fetch.items())
     for coin, price in price_data:
-        pricelist.append(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.11)) + "\n")
+        pricelist.append(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'])) + "\n")
     a = "".join(pricelist)
     context.bot.send_message(chat_id=context.job.context, text=a)
 
@@ -131,8 +131,8 @@ def command_handler(update, context):
 
 
 def repeat(update, context):
-    context.bot.send_message(chat_id=update.message.chat_id, text='Setting a timer for 10 second!')
-    context.job_queue.run_repeating(repeat_fetch, 10, context=update.message.chat_id)
+    context.bot.send_message(chat_id=update.message.chat_id, text='repeater scheduled for 5 minutes!')
+    context.job_queue.run_repeating(repeat_fetch, 300, first=10, context=update.message.chat_id)
 
 
 def error_handling(update, context):
@@ -162,5 +162,6 @@ def main():
 
 if __name__ == '__main__':
     Telegram_API_KEY = environ['Telegram_API_KEY']
-    coinlist = ['bitcoin', 'dogecoin']
+    coinlist = ['bitcoin', 'dogecoin', 'Cardano', 'DigiByte', 'Zilliqa', 'Swipe', 'Ethereum',
+                'VeChain', 'NEM']
     main()
