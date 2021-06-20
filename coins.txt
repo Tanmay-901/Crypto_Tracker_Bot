@@ -1,0 +1,10 @@
+btc
+ada
+dgb
+zil
+sxp
+eth
+vet
+xem
+iost
+ltc
