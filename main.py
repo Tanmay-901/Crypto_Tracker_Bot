@@ -68,7 +68,7 @@ def look_for(c):
 
 
 def add_coin(update, context):
-    c = str(update.effective_message.text)[5:]
+    c = str(update.effective_message.text)[5:].lower()
     get_price_from_file()
     if len(c) < 2:
         update.message.reply_text("please send coin name with the command")
@@ -90,7 +90,7 @@ def add_coin(update, context):
 
 
 def remove_coin(update, context):
-    c = str(update.effective_message.text)[8:]
+    c = str(update.effective_message.text)[8:].lower()
     if len(c) < 2:
         update.message.reply_text("Abe Coin name to daal 🤨")
         time.sleep(2)
@@ -140,6 +140,7 @@ def repeat_fetch(context: telegram.ext.CallbackContext):
 def take_input(update, context):
     text = list(str(update.message.text).strip().split())
     for x in text:
+        x = x.lower()
         if look_for(x):
             fetch = requests.get(f'https://api.wazirx.com/api/v2/market-status').json()
             for i in fetch['markets']:
