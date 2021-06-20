@@ -1,6 +1,7 @@
 import logging
 import requests
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import telegram
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, JobQueue
 import os
 from os import environ
 import time
@@ -53,8 +54,7 @@ def look_for(c):
 def add_coin(update, context):
     c = str(update.effective_message.text)[5:]
     if len(c) <= 2:
-        update.message.reply_text("Abe Coin name to daal 🤨")
-        bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.TYPING)
+        update.message.reply_text("please send coin name with the command")
         time.sleep(2)
         update.message.reply_text("for example:\n/add Bitcoin")
         return
@@ -87,7 +87,10 @@ def remove_coin(update, context):
 
 
 def show_coins(update, context):
-    update.message.reply_text(" ".join(coinlist))
+    if len(coinlist) == 0:
+        update.message.reply_text("No Coin in tracking list!! ")
+    else:
+        update.message.reply_text(" ".join(coinlist))
 
 
 def fetch_price(update, context):
@@ -102,11 +105,18 @@ def fetch_price(update, context):
     update.message.reply_text(a)
 
 
+def repeat_fetch(context: telegram.ext.CallbackContext):
+    a = "%2C".join(coinlist)
+    pricelist = []
+    fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={a}&vs_currencies=inr").json()
+    price_data = list(fetch.items())
+    for coin, price in price_data:
+        pricelist.append(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.11)) + "\n")
+    a = "".join(pricelist)
+    context.bot.send_message(chat_id=context.job.context, text=a)
+
 def take_input(update, context):
     text = list(str(update.message.text).strip().split())
-    if text[0][0] == "/":
-        update.message.reply_text("Command not found")
-        return
     for i in text:
         if look_for(i):
             fetch = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={i}&vs_currencies=inr").json()
@@ -115,6 +125,14 @@ def take_input(update, context):
                 update.message.reply_text(str(coin) + " : ₹" + str("%.2f" % (fetch[coin]['inr'] * 1.11)) + "\n")
                 continue
 
+
+def command_handler(update, context):
+    update.message.reply_text(f"Command: {update.message.text} not found!!")
+
+
+def repeat(update, context):
+    context.bot.send_message(chat_id=update.message.chat_id, text='Setting a timer for 10 second!')
+    context.job_queue.run_repeating(repeat_fetch, 10, context=update.message.chat_id)
 
 
 def error_handling(update, context):
@@ -132,6 +150,9 @@ def main():
     dp.add_handler(CommandHandler("remove", remove_coin))
     dp.add_handler(CommandHandler("show", show_coins))
     dp.add_handler(CommandHandler("fetch", fetch_price))
+    dp.add_handler(CommandHandler("repeat", repeat))
+    # dp.add_handler(CommandHandler('stop', Stop))
+    dp.add_handler(MessageHandler(Filters.command, command_handler))
     dp.add_handler(MessageHandler(Filters.text, take_input))
 
     dp.add_error_handler(error_handling)
@@ -141,5 +162,5 @@ def main():
 
 if __name__ == '__main__':
     Telegram_API_KEY = environ['Telegram_API_KEY']
-    coinlist = []
+    coinlist = ['bitcoin', 'dogecoin']
     main()
