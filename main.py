@@ -44,16 +44,16 @@ def start_command(update, context):
 
 
 def help_command(update, context):
-    update.message.reply_text("Go and ask google for help! 😏")
-    time.sleep(2)
     update.message.reply_text('''
-Just kidding!!\nHere are some commands you can use in this bot\n
+Here are some commands you can use with this bot\n
 /start : start the bot\n
 /help : see commands\n
-/add <coin> : add coin to tracker\n
-/remove <coin> : remove coin from tracker\n
+/add <coin> : add coin to tracking list\n
+/remove <coin> : remove coin from tracking list\n
 /show : show current coinlist\n
-/fetch : fetch prices\n
+/fetch : fetch prices of coinlist\n
+beta version-
+/repeat <time interval in min>: send prices automatically after specified interval
 ''')
 
 
@@ -92,8 +92,7 @@ def add_coin(update, context):
 def remove_coin(update, context):
     c = str(update.effective_message.text)[8:].lower()
     if len(c) < 2:
-        update.message.reply_text("Abe Coin name to daal 🤨")
-        time.sleep(2)
+        update.message.reply_text("Please send coin name with the command")
         update.message.reply_text("for example:\n/remove Bitcoin")
         return
     if c in coinlist:
@@ -155,8 +154,14 @@ def command_handler(update, context):
 
 
 def repeat(update, context):
-    context.bot.send_message(chat_id=update.message.chat_id, text='repeater scheduled for 5 minutes!')
-    context.job_queue.run_repeating(repeat_fetch, 300, first=10, context=update.message.chat_id)
+    interval = str(update.effective_message.text)[8:]
+    if len(interval) == 0:
+        update.message.reply_text("Please enter time (in minutes) with the command")
+        update.message.reply_text("for example:\n/repeat 5")
+        return
+    context.bot.send_message(chat_id=update.message.chat_id, text='repeater scheduled for {} minutes!'.format(interval))
+    print('repeater scheduled for {} minutes({} seconds)!'.format(interval, float(interval)*60))
+    context.job_queue.run_repeating(repeat_fetch, float(interval)*60, first=5, context=update.message.chat_id)
 
 
 def error_handling(update, context):
