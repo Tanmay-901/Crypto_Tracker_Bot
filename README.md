@@ -3,6 +3,8 @@ Tracks Cryptocurrencies and send prices via telegram Bot.
 > Clck [here](https://t.me/crypto_currency_tracker_bot) to start using the bot.  
 
 * Default tacking list : **btc doge ada dgb zil sxp eth vet xem iost**  
+  
+![Coins.jpg](https://github.com/Tanmay-901/Crypto_Tracker_Bot/blob/master/Images/coins.jpg)
 
 ### Here are some commands you can use with this bot
 ```
