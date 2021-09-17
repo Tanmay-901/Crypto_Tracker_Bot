@@ -1,5 +1,6 @@
 # Crypto_Tracker_Bot
-Tracks Cryptocurrencies and send prices via telegram Bot.  
+Tracks Cryptocurrencies and send prices via telegram Bot using the Wazirx API.  
+To start using Wazirx to start investing in crypto click [here](https://wazirx.com/invite/xbddd4j6)  
 > Clck [here](https://t.me/crypto_currency_tracker_bot) to start using the bot.  
 
 * Default tacking list : **btc doge ada dgb zil sxp eth vet xem iost**  
